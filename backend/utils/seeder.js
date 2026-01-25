@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const Product = require('./models/productModel');
+const Product = require('../models/productModel');
 
 dotenv.config({ path: 'backend/config/config.env' });
 
