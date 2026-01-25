@@ -18,7 +18,7 @@ const ProductListing = () => {
     const [selectedRatings, setSelectedRatings] = useState(0);
     const [sortBy, setSortBy] = useState('relevance');
 
-    const { loading, error, products, productsCount } = useSelector((state) => state.products);
+    const { loading, error, products } = useSelector((state) => state.products);
 
     useEffect(() => {
         // Dispatch with filters
