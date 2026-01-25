@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import MetaData from '../components/MetaData';
 import PaymentModal from '../components/PaymentModal';
 
 const Shipping = () => {
-    const navigate = useNavigate();
     const { cartItems } = useSelector((state) => state.cart);
     const { user } = useSelector((state) => state.user);
 

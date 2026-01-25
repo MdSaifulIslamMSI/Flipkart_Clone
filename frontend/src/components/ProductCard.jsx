@@ -1,15 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Rating } from '@mui/material';
 
 const ProductCard = ({ product }) => {
-    const options = {
-        value: product.ratings,
-        readOnly: true,
-        precision: 0.5,
-        size: "small"
-    };
-
     return (
         <Link className="flex flex-col bg-white rounded-sm border border-gray-100 p-4 w-full h-full text-inherit no-underline hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative" to={`/product/${product._id}`}>
             <div className="h-48 w-full flex justify-center items-center mb-4 relative overflow-hidden bg-white">

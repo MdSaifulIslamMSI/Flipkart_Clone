@@ -5,7 +5,8 @@ import { fetchProductDetails } from '../redux/slices/productSlice';
 import { addToCart } from '../redux/slices/cartSlice';
 import Loader from '../components/Loader';
 import MetaData from '../components/MetaData';
-import { ShoppingCart, FlashOn, LocalOffer, VerifiedUser } from '@mui/icons-material';
+import { Rating } from '@mui/material';
+import { ShoppingCart, FlashOn, LocalOffer } from '@mui/icons-material';
 
 import PaymentModal from '../components/PaymentModal';
 import AIChatSupport from '../components/AIChatSupport';
