@@ -20,3 +20,4 @@ Thumbs.db
 
 # secrets
 VERCEL_ENV_COPY_HERE.txt
+.vercel
