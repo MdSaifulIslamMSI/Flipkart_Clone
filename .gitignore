@@ -17,3 +17,6 @@ yarn-error.log*
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# secrets
+VERCEL_ENV_COPY_HERE.txt
