@@ -65,8 +65,8 @@ const AdminDashboard = () => {
                     <nav className="flex-1 py-4">
                         <SidebarLink to="/admin/dashboard" icon={<Dashboard />} text="Dashboard" active />
                         <SidebarLink to="/admin/products" icon={<ShoppingBag />} text="Products" />
-                        <SidebarLink to="#" icon={<ListAlt />} text="Orders" />
-                        <SidebarLink to="#" icon={<People />} text="Users" />
+                        <SidebarLink to="/admin/orders" icon={<ListAlt />} text="Orders" />
+                        <SidebarLink to="/admin/users" icon={<People />} text="Users" />
                     </nav>
 
                     <div className="p-4 border-t border-gray-100">
@@ -137,8 +137,8 @@ const AdminDashboard = () => {
                                             <td className="p-4 font-medium">₹{order.amount.toLocaleString()}</td>
                                             <td className="p-4">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-bold ${order.status === 'Delivered' ? 'bg-green-100 text-green-700' :
-                                                        order.status === 'Shipped' ? 'bg-blue-100 text-blue-700' :
-                                                            'bg-yellow-100 text-yellow-700'
+                                                    order.status === 'Shipped' ? 'bg-blue-100 text-blue-700' :
+                                                        'bg-yellow-100 text-yellow-700'
                                                     }`}>
                                                     {order.status}
                                                 </span>

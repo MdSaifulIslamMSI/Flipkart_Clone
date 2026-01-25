@@ -54,8 +54,8 @@ const AdminProducts = () => {
                     <nav className="flex-1 py-4">
                         <SidebarLink to="/admin/dashboard" icon={<Dashboard />} text="Dashboard" />
                         <SidebarLink to="/admin/products" icon={<ShoppingBag />} text="Products" active />
-                        <SidebarLink to="#" icon={<ListAlt />} text="Orders" />
-                        <SidebarLink to="#" icon={<People />} text="Users" />
+                        <SidebarLink to="/admin/orders" icon={<ListAlt />} text="Orders" />
+                        <SidebarLink to="/admin/users" icon={<People />} text="Users" />
                     </nav>
 
                     <div className="p-4 border-t border-gray-100">
