@@ -4,7 +4,7 @@ import { fetchProducts } from '../redux/slices/productSlice';
 import ProductCard from '../components/ProductCard';
 import MetaData from '../components/MetaData';
 import Loader from '../components/Loader';
-import { Star, Favorite } from '@mui/icons-material';
+import { Star } from '@mui/icons-material';
 import { useSearchParams } from 'react-router-dom';
 
 const ProductListing = () => {

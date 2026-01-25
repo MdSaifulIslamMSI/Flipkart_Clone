@@ -1,0 +1,5 @@
+MONGO_URI=mongodb+srv://flipkartadmin:SAIF38ASUS@flipkart-cluster.fcpd3hx.mongodb.net/flipkart?retryWrites=true&w=majority
+JWT_SECRET=flipkart_secret_123
+CLOUDINARY_NAME=test
+CLOUDINARY_API_KEY=test
+CLOUDINARY_API_SECRET=test

@@ -1,7 +1,7 @@
 {
   "name": "flipkart",
   "version": "1.0.0",
-  "description": "Full Stack Flipkart Ecommerce",
+  "description": "Full Stack Flipkart Ecommerce Clone",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

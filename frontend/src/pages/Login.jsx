@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { login, clearErrors } from '../redux/slices/userSlice';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { login, clearErrors as clearAuthErrors } from '../redux/slices/userSlice';
 import MetaData from '../components/MetaData';
-import Loader from '../components/Loader';
 
 const Login = () => {
     const [email, setEmail] = useState('');

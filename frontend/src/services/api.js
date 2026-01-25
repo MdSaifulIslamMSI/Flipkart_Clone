@@ -2,7 +2,9 @@ import axios from 'axios';
 
 // Toggle this to switch between mock and real data
 // Ideally, this should come from process.env.REACT_APP_USE_MOCK
-const USE_MOCK_DATA = false;
+// Toggle this to switch between mock and real data
+// Ideally, this should come from process.env.REACT_APP_USE_MOCK
+// const USE_MOCK_DATA = false;
 
 // Use relative path in production (Vercel), localhost in dev
 const BASE_URL = process.env.NODE_ENV === 'production'

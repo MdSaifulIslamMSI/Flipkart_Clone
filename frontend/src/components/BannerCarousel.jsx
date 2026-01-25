@@ -65,10 +65,10 @@ const BannerCarousel = () => {
     // Auto-play
     useEffect(() => {
         const interval = setInterval(() => {
-            nextSlide();
+            setCurrent(prev => (prev === length - 1 ? 0 : prev + 1));
         }, 4000);
         return () => clearInterval(interval);
-    }, [current]);
+    }, [length]);
 
     if (!Array.isArray(SLIDES) || SLIDES.length <= 0) {
         return null;

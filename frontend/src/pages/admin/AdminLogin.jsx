@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { login, clearErrors } from '../../redux/slices/userSlice';
+import { login } from '../../redux/slices/userSlice';
 import { useNavigate } from 'react-router-dom';
 import MetaData from '../../components/MetaData';
 
