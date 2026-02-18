@@ -88,7 +88,7 @@ const BannerCarousel = () => {
                                 src={slide.image}
                                 alt={slide.title}
                                 className="w-full h-full object-cover"
-                                onError={(e) => { e.target.src = 'https://via.placeholder.com/1600x300?text=Lumina+Sale'; }}
+                                onError={(e) => { e.target.src = 'https://placehold.co/1600x300?text=Lumina+Sale'; }}
                             />
 
                             {/* Text Overlay (Gradient) - Optional styling similar to real banners */}

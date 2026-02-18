@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle, LocalMall } from '@mui/icons-material';
 import MetaData from '../components/MetaData';
-import { useDispatch } from 'react-redux';
+
 // import { clearCart } from '../redux/slices/cartSlice'; // Assuming you might have a clear action
 
 const OrderSuccess = () => {
@@ -10,10 +10,7 @@ const OrderSuccess = () => {
     const [searchParams] = useSearchParams();
     const reference = searchParams.get('reference');
 
-    useEffect(() => {
-        // Optional: specific cleanup actions
-        // dispatch(clearCart());
-    }, []);
+
 
     return (
         <div className="bg-gray-50 min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

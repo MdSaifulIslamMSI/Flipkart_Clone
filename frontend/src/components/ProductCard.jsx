@@ -21,7 +21,7 @@ const ProductCard = ({ product }) => {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-multiply"
                         onError={(e) => {
                             e.target.onerror = null;
-                            e.target.src = 'https://via.placeholder.com/200?text=Lumina';
+                            e.target.src = 'https://placehold.co/200x200?text=Lumina';
                         }}
                     />
                 )}

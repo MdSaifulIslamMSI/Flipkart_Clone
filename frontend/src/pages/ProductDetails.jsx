@@ -73,7 +73,7 @@ const ProductDetails = () => {
                                         alt={product.name}
                                         className="max-h-full max-w-full object-contain transition-transform duration-500 hover:scale-110"
                                         onError={(e) => {
-                                            e.target.src = 'https://via.placeholder.com/500?text=No+Image';
+                                            e.target.src = 'https://placehold.co/500x500?text=No+Image';
                                         }}
                                     />
                                 ) : (

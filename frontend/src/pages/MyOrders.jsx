@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React from 'react';
+
 import { Link } from 'react-router-dom';
 import MetaData from '../components/MetaData';
 import Loader from '../components/Loader';
