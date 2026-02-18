@@ -88,7 +88,7 @@ const AIChatSupport = ({ product }) => {
                                 <SmartToy className="text-primary text-xl" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-sm">Flipkart AI Support</h3>
+                                <h3 className="font-bold text-sm">Lumina AI Support</h3>
                                 <p className="text-[10px] opacity-80">Demo Mode • Academic Project</p>
                             </div>
                         </div>

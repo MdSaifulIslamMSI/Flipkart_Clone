@@ -45,6 +45,28 @@ class SearchFeatures {
         return this;
     }
 
+    sort() {
+        if (this.queryString.sort) {
+            const sortBy = this.queryString.sort;
+
+            if (sortBy === "newest") {
+                this.query = this.query.sort({ createdAt: -1 });
+            } else if (sortBy === "oldest") {
+                this.query = this.query.sort({ createdAt: 1 });
+            } else if (sortBy === "highest") {
+                this.query = this.query.sort({ price: -1 });
+            } else if (sortBy === "lowest") {
+                this.query = this.query.sort({ price: 1 });
+            } else if (sortBy === "popular") {
+                this.query = this.query.sort({ numOfReviews: -1, ratings: -1 });
+            }
+        } else {
+            // Default sort: Newest first
+            this.query = this.query.sort({ createdAt: -1 });
+        }
+        return this;
+    }
+
     pagination(resultPerPage) {
         const currentPage = Number(this.queryString.page) || 1;
 

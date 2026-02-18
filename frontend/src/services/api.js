@@ -21,11 +21,14 @@ const api = axios.create({
 
 
 
-export const getProducts = async (keyword = '', currentPage = 1, price = [0, 500000], category, ratings = 0) => {
+export const getProducts = async (keyword = '', currentPage = 1, price = [0, 500000], category, ratings = 0, sort = '') => {
     // Real API Call
     let link = `/products?keyword=${keyword}&page=${currentPage}&price[gte]=${price[0]}&price[lte]=${price[1]}&ratings[gte]=${ratings}`;
     if (category) {
         link = `/products?page=${currentPage}&price[gte]=${price[0]}&price[lte]=${price[1]}&category=${category}&ratings[gte]=${ratings}`;
+    }
+    if (sort) {
+        link += `&sort=${sort}`;
     }
     return api.get(link);
 };
@@ -38,8 +41,10 @@ export const loginUser = async (email, password) => {
     return api.post(`/login`, { email, password });
 };
 
+// Register
 export const registerUser = async (userData) => {
-    return api.post(`/register`, userData);
+    const config = { headers: { "Content-Type": "multipart/form-data" } };
+    return api.post(`/register`, userData, config);
 };
 
 export const loadUser = async () => {

@@ -24,7 +24,7 @@ const PaymentModal = ({ isOpen, onClose, amount }) => {
     const handleClose = () => {
         onClose();
         if (step === 'success') {
-            navigate('/');
+            navigate('/order/success?reference=' + Math.floor(Math.random() * 10000000));
         }
     };
 
@@ -57,7 +57,7 @@ const PaymentModal = ({ isOpen, onClose, amount }) => {
                             </div>
 
                             <h4 className="text-gray-500 font-medium mb-1">Paying to</h4>
-                            <h2 className="text-xl font-bold text-gray-800 mb-6">Flipkart Clone Merchant</h2>
+                            <h2 className="text-xl font-bold text-gray-800 mb-6">Lumina Merchant</h2>
 
                             <h1 className="text-4xl font-bold text-gray-900 mb-8">₹{amount?.toLocaleString()}</h1>
 

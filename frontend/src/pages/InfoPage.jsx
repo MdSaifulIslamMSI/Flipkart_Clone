@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 const InfoPage = ({ title }) => {
     return (
         <>
-            <MetaData title={`${title} - Flipkart Clone`} />
+            <MetaData title={`${title} - Lumina`} />
             <div className="bg-[#f1f3f6] min-h-screen py-8">
                 <div className="container mx-auto px-4 max-w-4xl">
                     <div className="bg-white p-8 shadow-sm rounded-sm">
@@ -20,7 +20,7 @@ const InfoPage = ({ title }) => {
 
                         <div className="text-gray-600 space-y-4 leading-relaxed text-sm">
                             <p>
-                                Welcome to the <strong>{title}</strong> page of our Flipkart Clone project.
+                                Welcome to the <strong>{title}</strong> page of our Lumina project.
                                 This section is traditionally used to display legal information, company details, or help resources.
                             </p>
                             <p>

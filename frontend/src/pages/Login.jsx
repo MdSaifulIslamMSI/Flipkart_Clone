@@ -14,16 +14,9 @@ const Login = () => {
 
     const { loading, error, isAuthenticated } = useSelector((state) => state.user);
 
-    // Get redirect path (e.g., from query string)
-    // Example: /login?redirect=/shipping
     const redirect = location.search ? location.search.split('=')[1] : '/';
 
     useEffect(() => {
-        if (error) {
-            // In a real app, show a toast here
-            // dispatch(clearErrors()); // Clear after showing
-        }
-
         if (isAuthenticated) {
             navigate(redirect);
         }
@@ -36,65 +29,59 @@ const Login = () => {
 
     return (
         <>
-            <MetaData title="Login - Flipkart" />
-            <div className="bg-[#f1f3f6] min-h-screen flex items-center justify-center py-10">
-                <div className="bg-white flex flex-col md:flex-row w-full max-w-4xl h-[500px] shadow-lg rounded-sm overflow-hidden animate-fade-in-up">
+            <MetaData title="Login - Lumina" />
+            <div className="bg-[#f1f3f6] min-h-screen flex items-center justify-center py-10 px-4">
+                <div className="bg-white w-full max-w-md shadow-xl rounded-xl overflow-hidden animate-fade-in-up">
 
-                    {/* Left Side Info */}
-                    <div className="bg-primary text-white p-10 w-full md:w-2/5 flex flex-col justify-between">
-                        <div>
-                            <h2 className="text-3xl font-medium mb-4">Login</h2>
-                            <p className="text-gray-200 text-lg leading-relaxed">Get access to your Orders, Wishlist and Recommendations</p>
-                        </div>
-                        <div className="mt-10">
-                            <img src="https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/login_img_c4a81e.png" alt="login-img" className="w-full" />
-                        </div>
+                    {/* Header */}
+                    <div className="bg-primary p-8 text-center text-white">
+                        <h2 className="text-3xl font-bold mb-2">Welcome Back</h2>
+                        <p className="opacity-90">Login to access your account</p>
                     </div>
 
-                    {/* Right Side Form */}
-                    <div className="w-full md:w-3/5 p-10 flex flex-col justify-center relative">
-
-                        {/* Demo Label */}
-                        <div className="absolute top-4 right-4 bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-1 rounded border border-yellow-200">
+                    <div className="p-8">
+                        {/* Demo Warning */}
+                        <div className="bg-yellow-50 text-yellow-800 text-xs font-bold px-3 py-2 rounded border border-yellow-200 mb-6 text-center">
                             DEMO MODE: Do not use real passwords
                         </div>
 
                         <form onSubmit={loginSubmit} className="flex flex-col gap-6">
-                            <div className="relative">
+                            <div className="flex flex-col gap-1">
+                                <label className="text-sm font-medium text-gray-700">Email Address</label>
                                 <input
                                     type="email"
-                                    placeholder="Enter Email/Mobile number"
-                                    className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-primary text-sm transition-colors"
+                                    placeholder="Enter your email"
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm transition-all"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
                                 />
                             </div>
-                            <div className="relative">
+
+                            <div className="flex flex-col gap-1">
+                                <label className="text-sm font-medium text-gray-700">Password</label>
                                 <input
                                     type="password"
-                                    placeholder="Enter Password"
-                                    className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-primary text-sm transition-colors"
+                                    placeholder="Enter your password"
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm transition-all"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
                             </div>
 
-                            <p className="text-gray-500 text-xs">By continuing, you agree to Flipkart's Terms of Use and Privacy Policy.</p>
-
-                            {error && <span className="text-red-500 text-xs text-center">{error}</span>}
+                            {error && <div className="bg-red-50 text-red-500 text-sm p-3 rounded-lg text-center border border-red-100">{error}</div>}
 
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className={`bg-[#fb641b] text-white font-medium py-3 rounded-sm shadow-md hover:shadow-lg transition-all ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                className={`bg-primary text-white font-bold py-3 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                             >
                                 {loading ? 'Logging in...' : 'Login'}
                             </button>
 
-                            <div className="text-center mt-4">
-                                <Link to="/register" className="text-primary font-medium text-sm hover:underline">New to Flipkart? Create an account</Link>
+                            <div className="text-center mt-4 text-sm text-gray-600">
+                                New to Lumina? <Link to="/register" className="text-primary font-bold hover:underline">Create an account</Link>
                             </div>
                         </form>
                     </div>

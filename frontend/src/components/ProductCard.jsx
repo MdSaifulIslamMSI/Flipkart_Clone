@@ -1,44 +1,76 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Star, FavoriteBorder, ShoppingCartOutlined } from '@mui/icons-material';
 
 const ProductCard = ({ product }) => {
     return (
-        <Link className="flex flex-col bg-white rounded-sm border border-gray-100 p-4 w-full h-full text-inherit no-underline hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative" to={`/product/${product._id}`}>
-            <div className="h-48 w-full flex justify-center items-center mb-4 relative overflow-hidden bg-white">
+        <Link
+            to={`/product/${product._id}`}
+            className="group block bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-2xl hover:border-purple-100 transition-all duration-300 relative"
+        >
+            {/* Image Container */}
+            <div className="relative h-64 w-full bg-gray-50 flex items-center justify-center overflow-hidden">
                 {(!product.images || !product.images[0] || !product.images[0].url) ? (
-                    <div className="flex flex-col items-center justify-center text-gray-400 w-full h-full bg-gray-50">
-                        <svg className="w-12 h-12 mb-1 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <span className="text-[10px] font-medium">No Image</span>
+                    <div className="text-gray-300 flex flex-col items-center">
+                        <span className="text-xs">No Image</span>
                     </div>
                 ) : (
                     <img
                         src={product.images[0].url}
                         alt={product.name}
-                        className="max-h-full max-w-full object-contain transform group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 mix-blend-multiply"
                         onError={(e) => {
                             e.target.onerror = null;
-                            e.target.src = 'https://via.placeholder.com/200?text=No+Image';
-                            e.target.classList.add('opacity-50', 'grayscale');
+                            e.target.src = 'https://via.placeholder.com/200?text=Lumina';
                         }}
                     />
                 )}
-            </div>
 
-            <div className="flex flex-col gap-1.5 flex-grow">
-                <h3 className="font-medium text-gray-800 text-sm line-clamp-2 h-10 group-hover:text-primary transition-colors leading-tight" title={product.name}>{product.name}</h3>
-
-                <div className="flex items-center gap-2">
-                    <div className="bg-green-700 text-white text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                        {product.ratings} <span>★</span>
-                    </div>
-                    <span className="text-gray-500 text-xs font-medium">({product.numOfReviews.toLocaleString()})</span>
+                {/* Floating Action Buttons (Mock) */}
+                <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-x-4 group-hover:translate-x-0">
+                    <button className="bg-white p-2 rounded-full shadow-md text-gray-400 hover:text-red-500 transition-colors">
+                        <FavoriteBorder fontSize="small" />
+                    </button>
+                    <button className="bg-white p-2 rounded-full shadow-md text-gray-400 hover:text-primary transition-colors">
+                        <ShoppingCartOutlined fontSize="small" />
+                    </button>
                 </div>
 
-                <div className="flex items-center gap-3 mt-1">
-                    <span className="font-bold text-lg text-gray-900">₹{product.price.toLocaleString('en-IN')}</span>
-                    {/* Mock Discount visual */}
-                    <span className="text-xs text-gray-500 line-through">₹{(product.price * 1.2).toFixed(0)}</span>
-                    <span className="text-xs text-green-600 font-bold">20% off</span>
+                {/* Badges */}
+                {product.ratings >= 4 && (
+                    <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-xs font-bold px-2 py-1 rounded-md text-primary shadow-sm">
+                        Top Rated
+                    </span>
+                )}
+            </div>
+
+            {/* Content */}
+            <div className="p-5">
+                {/* Brand / Category (Optional) */}
+                <p className="text-xs text-gray-500 mb-1 uppercase tracking-wider font-medium">{product.category}</p>
+
+                <h3 className="font-semibold text-gray-900 text-lg mb-2 line-clamp-1 group-hover:text-primary transition-colors">
+                    {product.name}
+                </h3>
+
+                {/* Rating - Modern Style */}
+                <div className="flex items-center gap-1 mb-3">
+                    <div className="flex text-yellow-500">
+                        <Star fontSize="inherit" className="text-[16px]" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">{product.ratings}</span>
+                    <span className="text-xs text-gray-400 mx-1">•</span>
+                    <span className="text-xs text-gray-400">{product.numOfReviews} reviews</span>
+                </div>
+
+                <div className="flex items-center justify-between mt-4 border-t border-dashed border-gray-100 pt-3">
+                    <div className="flex flex-col">
+                        <span className="text-xs text-gray-400 line-through">₹{Math.round(product.price * 1.2).toLocaleString()}</span>
+                        <span className="font-bold text-xl text-gray-900">₹{product.price.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="bg-purple-50 text-primary text-xs font-bold px-2 py-1 rounded-lg">
+                        -20%
+                    </div>
                 </div>
             </div>
         </Link>

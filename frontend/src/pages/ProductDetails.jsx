@@ -5,9 +5,7 @@ import { fetchProductDetails } from '../redux/slices/productSlice';
 import { addToCart } from '../redux/slices/cartSlice';
 import Loader from '../components/Loader';
 import MetaData from '../components/MetaData';
-
-import { ShoppingCart, FlashOn, LocalOffer } from '@mui/icons-material';
-
+import { ShoppingCart, FlashOn, LocalOffer, Star, Verified, LocalShipping, Cached, Security } from '@mui/icons-material';
 import PaymentModal from '../components/PaymentModal';
 import AIChatSupport from '../components/AIChatSupport';
 
@@ -16,6 +14,7 @@ const ProductDetails = () => {
     const dispatch = useDispatch();
     const { productDetails: product, loading, error } = useSelector((state) => state.products);
     const [showPayment, setShowPayment] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(0);
 
     useEffect(() => {
         dispatch(fetchProductDetails(id));
@@ -39,22 +38,14 @@ const ProductDetails = () => {
 
     // Static Mock Data for UI Polish
     const offers = [
-        "Bank Offer 5% Cashback on Flipkart Axis Bank Card",
-        "Special Price Get extra 10% off (price inclusive of discount)",
+        "5% Cashback on Lumina Bank Card",
+        "Get extra 10% off (price inclusive of discount)",
         "No Cost EMI available on selected cards"
-    ];
-
-    const highlights = [
-        "1 Year Warranty",
-        "7 Days Replacement Policy",
-        "Cash on Delivery available",
-        product.category === 'Mobiles' ? "4 GB RAM | 64 GB ROM | Expandable Upto 256 GB" : "Top quality material",
-        "Plus Member exclusive benefits"
     ];
 
     return (
         <>
-            <MetaData title={`${product.name} - Flipkart Clone`} />
+            <MetaData title={`${product.name} - Lumina`} />
             <PaymentModal
                 isOpen={showPayment}
                 onClose={() => setShowPayment(false)}
@@ -63,161 +54,170 @@ const ProductDetails = () => {
             {/* AI Chat Support Demo */}
             <AIChatSupport product={product} />
 
-            <div className="bg-[#f1f3f6] min-h-screen py-4">
-                <div className="container mx-auto px-4 max-w-[1280px] flex flex-col md:flex-row bg-white shadow-sm rounded-sm overflow-hidden">
+            <div className="bg-gray-50 min-h-screen py-8 font-sans">
+                <div className="container mx-auto px-4 max-w-7xl">
 
-                    {/* Left Column: Image & Buttons */}
-                    <div className="w-full md:w-[40%] p-4 flex flex-col relative border-r border-gray-100">
-                        {/* Wishlist Icon (decorative) */}
-                        <div className="absolute top-4 right-4 text-gray-300 cursor-pointer hover:text-red-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                        </div>
-
-                        <div className="flex-1 flex items-center justify-center p-8 h-[400px] relative">
-                            {(!product.images || !product.images[0] || !product.images[0].url) ? (
-                                <div className="flex flex-col items-center justify-center text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-lg w-full h-full">
-                                    <svg className="w-16 h-16 mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    <span className="text-sm font-medium">No Image Available</span>
-                                </div>
-                            ) : (
-                                <img
-                                    src={product.images[0].url}
-                                    alt={product.name}
-                                    className="max-h-full max-w-full object-contain hover:scale-105 transition-transform duration-300"
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.src = 'https://via.placeholder.com/400?text=Product+Image+Not+Found';
-                                        e.target.classList.add('opacity-50', 'grayscale');
-                                    }}
-                                />
-                            )}
-                        </div>
-
-                        <div className="flex gap-2 mt-4 px-2">
-                            <button onClick={addToCartHandler} className="flex-1 bg-[#ff9f00] text-white py-3.5 font-bold rounded-[2px] shadow-sm hover:shadow-md transition-shadow flex items-center justify-center gap-2 text-sm md:text-base">
-                                <ShoppingCart className="text-white" /> ADD TO CART
-                            </button>
-                            <button
-                                onClick={() => setShowPayment(true)}
-                                className="flex-1 bg-[#fb641b] text-white py-3.5 font-bold rounded-[2px] shadow-sm hover:shadow-md transition-shadow flex items-center justify-center gap-2 text-sm md:text-base"
-                            >
-                                <FlashOn className="text-white" /> BUY NOW
-                            </button>
-                        </div>
+                    {/* Breadcrumbs */}
+                    <div className="text-sm text-gray-500 mb-6">
+                        Home <span className="mx-2">/</span> {product.category} <span className="mx-2">/</span> <span className="text-gray-900 font-medium">{product.name}</span>
                     </div>
 
-                    {/* Right Column: details */}
-                    <div className="w-full md:w-[60%] p-6 pl-8">
-                        {/* Breadcrumbs (Mock) */}
-                        <p className="text-xs text-gray-500 mb-2 hover:text-primary cursor-pointer">
-                            Home &gt; {product.category} &gt; {product.brand?.name || product.brand || 'Generic'} &gt; {product.name}
-                        </p>
+                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-2 gap-0">
 
-                        <h1 className="text-xl font-medium text-gray-800 mb-2">{product.name}</h1>
-
-                        <div className="flex items-center gap-4 mb-4">
-                            <span className="bg-green-700 text-white text-xs px-2 py-0.5 rounded-[3px] flex items-center gap-1 font-bold">
-                                {product.ratings} <span className="text-[10px]">★</span>
-                            </span>
-                            <span className="text-gray-500 font-medium text-sm">{product.numOfReviews} Ratings & {Math.floor(product.numOfReviews * 0.2)} Reviews</span>
-                            {product.assured && (
-                                <img src="https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/fa_62673a.png" alt="Assured" className="h-5" />
-                            )}
-                        </div>
-
-                        {/* ... */}
-
-                        <div className="grid grid-cols-12 p-3 text-sm">
-                            <div className="col-span-4 text-gray-500">Brand</div>
-                            <div className="col-span-8 text-gray-900 font-medium">{product.brand?.name || product.brand || 'Generic'}</div>
-                        </div>
-
-                        <div className="flex items-end gap-3 mb-4">
-                            <h2 className="text-3xl font-bold text-gray-900">₹{product.price?.toLocaleString()}</h2>
-                            <span className="text-gray-500 line-through text-sm">₹{(product.price * 1.2).toLocaleString()}</span>
-                            <span className="text-green-600 font-bold text-sm">20% off</span>
-                        </div>
-
-                        {/* Offers */}
-                        <div className="mb-6">
-                            <h3 className="font-bold text-sm text-gray-800 mb-2">Available offers</h3>
-                            <ul className="space-y-2">
-                                {offers.map((offer, index) => (
-                                    <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
-                                        <LocalOffer className="text-green-600 text-base mt-0.5" />
-                                        <span><span className="font-medium text-gray-800">{offer.split(' ')[0]} {offer.split(' ')[1]}</span> {offer.substring(offer.indexOf(' ') + offer.split(' ')[1].length + 1)}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Highlights & Description Grid relative */}
-                        <div className="flex flex-col md:flex-row gap-8 mb-6">
-                            {/* Highlights */}
-                            <div className="flex-1">
-                                <div className="flex gap-16">
-                                    <span className="text-gray-500 text-sm font-medium w-24">Highlights</span>
-                                    <ul className="list-disc pl-4 space-y-1 text-sm text-gray-700 flex-1">
-                                        {highlights.map((h, i) => <li key={i}>{h}</li>)}
-                                    </ul>
+                        {/* Left Column: Image Gallery */}
+                        <div className="p-8 bg-white flex flex-col items-center justify-center border-b lg:border-b-0 lg:border-r border-gray-100 relative">
+                            <div className="w-full h-[400px] lg:h-[500px] flex items-center justify-center mb-6 relative group">
+                                {product.images && product.images[selectedImage] ? (
+                                    <img
+                                        src={product.images[selectedImage].url}
+                                        alt={product.name}
+                                        className="max-h-full max-w-full object-contain transition-transform duration-500 hover:scale-110"
+                                        onError={(e) => {
+                                            e.target.src = 'https://via.placeholder.com/500?text=No+Image';
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="text-gray-300 flex flex-col items-center">
+                                        <div className="w-24 h-24 bg-gray-100 rounded-full mb-2"></div>
+                                        <span>No Image</span>
+                                    </div>
+                                )}
+                                <div className="absolute top-4 right-4">
+                                    <button className="p-2 rounded-full bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                                    </button>
                                 </div>
                             </div>
+
+                            {/* Thumbnails */}
+                            <div className="flex gap-4 overflow-x-auto py-2 px-1 w-full justify-center">
+                                {product.images && product.images.map((img, index) => (
+                                    <div
+                                        key={index}
+                                        onClick={() => setSelectedImage(index)}
+                                        className={`w-20 h-20 border-2 rounded-lg cursor-pointer p-1 flex items-center justify-center transition-all ${selectedImage === index ? 'border-primary shadow-md' : 'border-gray-200 hover:border-gray-300'}`}
+                                    >
+                                        <img src={img.url} alt="" className="max-h-full max-w-full object-contain" />
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Action Buttons (Mobile: Fixed Bottom, Desktop: Inline) */}
+                            <div className="flex gap-4 w-full mt-8">
+                                <button
+                                    onClick={addToCartHandler}
+                                    className="flex-1 py-4 rounded-xl font-bold text-gray-900 border-2 border-gray-200 hover:border-gray-900 hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <ShoppingCart /> ADD TO CART
+                                </button>
+                                <button
+                                    onClick={() => setShowPayment(true)}
+                                    className="flex-1 py-4 rounded-xl font-bold text-white bg-primary hover:bg-purple-700 shadow-lg hover:shadow-primary/30 transition-all flex items-center justify-center gap-2"
+                                >
+                                    <FlashOn /> BUY NOW
+                                </button>
+                            </div>
                         </div>
 
-                        {/* Seller Info */}
-                        <div className="flex items-start gap-16 mb-8">
-                            <span className="text-gray-500 text-sm font-medium w-24">Seller</span>
-                            <div className="flex flex-col">
-                                <span className="text-primary font-medium text-sm flex items-center gap-1">
-                                    SuperComNet <span className="bg-blue-600 text-white text-[10px] px-1 rounded-full">4.9 ★</span>
-                                </span>
-                                <ul className="list-disc pl-4 text-xs text-gray-500 mt-1">
-                                    <li>7 Days Replacement Policy?</li>
-                                    <li>GST invoice available</li>
-                                </ul>
+                        {/* Right Column: Details */}
+                        <div className="p-8 lg:p-10 bg-white flex flex-col h-full overflow-y-auto custom-scrollbar">
+                            <div className="mb-1">
+                                <span className="text-primary font-bold tracking-wider text-xs uppercase">{product.category}</span>
                             </div>
-                        </div>
+                            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight font-['Poppins']">{product.name}</h1>
 
-                        {/* Description */}
-                        <div className="border bg-white rounded-sm mt-4">
-                            <div className="p-4 border-b">
-                                <h3 className="text-xl font-medium text-gray-800">Product Description</h3>
+                            {/* Ratings & Brand */}
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">
+                                    <span>{product.ratings}</span> <Star fontSize="small" />
+                                </div>
+                                <span className="text-gray-500 text-sm font-medium">{product.numOfReviews} Ratings</span>
+                                {product.assured && (
+                                    <span className="flex items-center gap-1 text-blue-600 text-xs font-bold bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
+                                        <Verified fontSize="inherit" /> Lumina Verified
+                                    </span>
+                                )}
                             </div>
-                            <div className="p-4 text-sm text-gray-700 leading-relaxed">
-                                {product.description}
-                            </div>
-                        </div>
 
-                        {/* Specifications Table (Mock) */}
-                        <div className="border bg-white rounded-sm mt-4">
-                            <div className="p-4 border-b">
-                                <h3 className="text-xl font-medium text-gray-800">Specifications</h3>
+                            {/* Price */}
+                            <div className="mb-8">
+                                <div className="flex items-end gap-3 mb-2">
+                                    <h2 className="text-4xl font-bold text-gray-900">₹{product.price?.toLocaleString()}</h2>
+                                    <span className="text-xl text-gray-400 line-through">₹{(product.price * 1.2).toLocaleString()}</span>
+                                    <span className="text-green-600 font-bold text-lg bg-green-50 px-2 rounded">20% OFF</span>
+                                </div>
+                                <p className="text-sm text-gray-500">Inclusive of all taxes</p>
                             </div>
-                            <div className="p-4">
-                                <div className="border border-gray-200">
-                                    <div className="p-3 border-b border-gray-200 bg-gray-50 text-sm font-medium text-gray-600">General</div>
-                                    <div className="divide-y divide-gray-200">
-                                        <div className="grid grid-cols-12 p-3 text-sm">
-                                            <div className="col-span-4 text-gray-500">Brand</div>
-                                            <div className="col-span-8 text-gray-900 font-medium">{product.brand?.name || product.brand || 'Generic'}</div>
+
+                            {/* Offers Grid */}
+                            <div className="grid gap-3 mb-8">
+                                <h3 className="font-bold text-gray-800 flex items-center gap-2"><LocalOffer className="text-primary" /> Available Offers</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {offers.map((offer, i) => (
+                                        <div key={i} className="bg-purple-50 p-3 rounded-lg border border-purple-100 text-sm text-gray-700 flex items-start gap-2">
+                                            <span className="text-primary font-bold">•</span>
+                                            {offer}
                                         </div>
-                                        <div className="grid grid-cols-12 p-3 text-sm">
-                                            <div className="col-span-4 text-gray-500">Model Name</div>
-                                            <div className="col-span-8 text-gray-900 font-medium">{product.name}</div>
-                                        </div>
-                                        <div className="grid grid-cols-12 p-3 text-sm">
-                                            <div className="col-span-4 text-gray-500">Category</div>
-                                            <div className="col-span-8 text-gray-900 font-medium">{product.category}</div>
-                                        </div>
-                                        <div className="grid grid-cols-12 p-3 text-sm">
-                                            <div className="col-span-4 text-gray-500">Stock</div>
-                                            <div className="col-span-8 text-gray-900 font-medium">{product.stock > 0 ? "In Stock" : "Out of Stock"}</div>
-                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Description */}
+                            <div className="mb-8">
+                                <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2">Description</h3>
+                                <p className="text-gray-600 leading-relaxed text-sm md:text-base">
+                                    {product.description}
+                                </p>
+                            </div>
+
+                            {/* Specifications */}
+                            <div className="mb-8">
+                                <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Specifications</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                    <div className="flex flex-col">
+                                        <span className="text-xs text-gray-500 uppercase font-semibold">Brand</span>
+                                        <span className="font-medium text-gray-900">{product.brand?.name || product.brand || 'Generic'}</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-xs text-gray-500 uppercase font-semibold">Model</span>
+                                        <span className="font-medium text-gray-900">{product.name}</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-xs text-gray-500 uppercase font-semibold">Stock Status</span>
+                                        <span className={`font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                            {product.stock > 0 ? "In Stock" : "Out of Stock"}
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-xs text-gray-500 uppercase font-semibold">Warranty</span>
+                                        <span className="font-medium text-gray-900">1 Year Manufacturer Warranty</span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
+                            {/* Trust Badges */}
+                            <div className="grid grid-cols-3 gap-4 border-t pt-6 mt-auto">
+                                <div className="flex flex-col items-center text-center gap-2">
+                                    <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-600">
+                                        <Security />
+                                    </div>
+                                    <span className="text-xs font-medium text-gray-500">1 Year Warranty</span>
+                                </div>
+                                <div className="flex flex-col items-center text-center gap-2">
+                                    <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-600">
+                                        <Cached />
+                                    </div>
+                                    <span className="text-xs font-medium text-gray-500">7 Day Replacement</span>
+                                </div>
+                                <div className="flex flex-col items-center text-center gap-2">
+                                    <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-600">
+                                        <LocalShipping />
+                                    </div>
+                                    <span className="text-xs font-medium text-gray-500">Fast Delivery</span>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-# Flipkart Clone (MERN Stack)
+# Lumina E-Commerce (MERN Stack)
 
 A production-grade e-commerce application built as a final year engineering project. This system demonstrates a scalable "Modular Monolith" architecture, mimicking core Flipkart functionalities including product management, cart operations, user authentication, and an AI-powered customer support system.
 

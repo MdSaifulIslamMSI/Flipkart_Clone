@@ -48,7 +48,7 @@ const AdminProducts = () => {
                 {/* Sidebar (Duplicate for now, best to extract to Layout component in future refactor) */}
                 <div className="w-64 bg-white shadow-md fixed h-full hidden md:flex flex-col z-10">
                     <div className="p-6 border-b border-gray-100">
-                        <h1 className="text-xl font-bold text-gray-800 tracking-wide">FLIPKART <span className="text-blue-600">ADMIN</span></h1>
+                        <h1 className="text-xl font-bold text-gray-800 tracking-wide">LUMINA <span className="text-purple-600">ADMIN</span></h1>
                     </div>
 
                     <nav className="flex-1 py-4">

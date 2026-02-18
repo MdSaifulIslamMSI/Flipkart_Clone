@@ -13,7 +13,8 @@ exports.getAllProducts = asyncErrorHandler(async (req, res, next) => {
 
     const searchFeature = new SearchFeatures(Product.find(), req.query)
         .search()
-        .filter();
+        .filter()
+        .sort();
 
     let products = await searchFeature.query;
     let filteredProductsCount = products.length;
@@ -230,7 +231,7 @@ exports.createProductReview = asyncErrorHandler(async (req, res, next) => {
 
     if (isReviewed) {
 
-        product.reviews.forEach((rev) => { 
+        product.reviews.forEach((rev) => {
             if (rev.user.toString() === req.user._id.toString())
                 (rev.rating = rating, rev.comment = comment);
         });

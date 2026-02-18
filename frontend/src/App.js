@@ -13,7 +13,10 @@ const ProductDetails = lazy(() => import('./pages/ProductDetails'));
 const ProductListing = lazy(() => import('./pages/ProductListing'));
 const Cart = lazy(() => import('./pages/Cart'));
 const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
 const Shipping = lazy(() => import('./pages/Shipping'));
+const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
+const MyOrders = lazy(() => import('./pages/MyOrders'));
 const InfoPage = lazy(() => import('./pages/InfoPage'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
@@ -44,12 +47,15 @@ function App() {
             <Route path="/products/:keyword" element={<ProductListing />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/shipping" element={<Shipping />} />
+            <Route path="/order/success" element={<OrderSuccess />} />
+            <Route path="/orders" element={<MyOrders />} />
             {/* Footer Static Pages */}
             <Route path="/contact" element={<InfoPage title="Contact Us" />} />
             <Route path="/about" element={<InfoPage title="About Us" />} />
             <Route path="/careers" element={<InfoPage title="Careers" />} />
-            <Route path="/stories" element={<InfoPage title="Flipkart Stories" />} />
+            <Route path="/stories" element={<InfoPage title="Lumina Stories" />} />
             <Route path="/payments" element={<InfoPage title="Payments" />} />
             <Route path="/shipping-info" element={<InfoPage title="Shipping" />} />
             <Route path="/cancellation-returns" element={<InfoPage title="Cancellation & Returns" />} />

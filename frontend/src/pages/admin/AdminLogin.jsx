@@ -17,9 +17,6 @@ const AdminLogin = () => {
         if (isAuthenticated && user?.role === 'admin') {
             navigate('/admin/dashboard');
         } else if (isAuthenticated && user?.role !== 'admin') {
-            // If logged in as normal user, maybe redirect or show error
-            alert("Access Denied: You are not an admin");
-            // Optional: logout logic or redirect home
             navigate('/');
         }
     }, [dispatch, isAuthenticated, user, navigate]);
@@ -31,7 +28,7 @@ const AdminLogin = () => {
 
     return (
         <>
-            <MetaData title="Admin Login - Flipkart" />
+            <MetaData title="Admin Login - Lumina" />
             <div className="bg-gray-100 min-h-screen flex items-center justify-center py-10">
                 <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
 
@@ -76,7 +73,7 @@ const AdminLogin = () => {
 
                         <div className="text-center mt-4 p-3 bg-blue-50 text-blue-800 text-xs rounded border border-blue-100">
                             <strong>Demo Credentials:</strong><br />
-                            Email: admin@flipkart.com<br />
+                            Email: admin@lumina.com<br />
                             Password: admin123
                         </div>
                     </form>

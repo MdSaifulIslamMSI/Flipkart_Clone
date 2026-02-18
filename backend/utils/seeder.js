@@ -14,49 +14,54 @@ const connectDatabase = () => {
         })
 }
 
-// 10 Categories requested in previous turn
+// 10 Categories
 const CATEGORIES = [
     'Mobiles', 'Electronics', 'Fashion', 'Home', 'Appliances',
     'Toys', 'Laptops', 'Headphones', 'Smartwatches', 'Accessories'
 ];
 
-// Category Specific Images (Stable Unsplash IDs)
-const CATEGORY_IMAGES = {
-    'Mobiles': 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80', // Phone
-    'Electronics': 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80', // Monitor/Laptop setup
-    'Fashion': 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=500&q=80', // T-shirt
-    'Home': 'https://images.unsplash.com/photo-1522771753062-811c0556e494?w=500&q=80', // Sofa/Room
-    'Appliances': 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=500&q=80', // Kitchen Mixer/Appliance
-    'Toys': 'https://images.unsplash.com/photo-1566576912902-1b918b958c8e?w=500&q=80', // Toy Car
-    'Laptops': 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80', // Laptop
-    'Headphones': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80', // Headphone
-    'Smartwatches': 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80', // Watch
-    'Accessories': 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=500&q=80' // Shoes/Bag
+// Map Categories to LoremFlickr Keywords
+const CATEGORY_KEYWORDS = {
+    'Mobiles': 'smartphone',
+    'Electronics': 'technology',
+    'Fashion': 'fashion,clothing',
+    'Home': 'furniture,interior',
+    'Appliances': 'appliance,kitchen',
+    'Toys': 'toy',
+    'Laptops': 'laptop,computer',
+    'Headphones': 'headphones,audio',
+    'Smartwatches': 'watch,smartwatch',
+    'Accessories': 'accessories,bag'
 };
 
-// Helper to generate random product
-const generateProduct = (i, category) => {
+// Helper to generate random product with unique image
+const generateProduct = (i, category, globalIndex) => {
+    const keyword = CATEGORY_KEYWORDS[category] || 'product';
+    // Use lock to ensure unique image per product across all categories
+    const uniqueImage = `https://loremflickr.com/640/480/${keyword}?lock=${globalIndex}`;
+
     return {
-        name: `${category} Product ${i} - ${Math.floor(Math.random() * 1000)}`,
-        description: `This is a high-quality ${category} item. Feature rich and durable. Great for daily use.`,
-        price: Math.floor(Math.random() * 50000) + 500,
+        name: `${category} Premium Item ${i} - ${Math.floor(Math.random() * 1000)}`,
+        description: `Experience the best quality with this premium ${category} product. Designed for durability and styled for modern living. A perfect addition to your collection.`,
+        price: Math.floor(Math.random() * 50000) + 999,
         cuttedPrice: Math.floor(Math.random() * 60000) + 60000,
         images: [{
-            public_id: `test_id_${i}`,
-            url: CATEGORY_IMAGES[category] || "https://rukminim1.flixcart.com/image/416/416/xif0q/mobile/l/v/8/-original-imaghx9qudmydgc4.jpeg?q=70"
+            public_id: `lumina_prod_${globalIndex}`,
+            url: uniqueImage
         }],
         brand: {
-            name: "Generic Brand",
+            name: "Lumina Select",
             logo: { public_id: "logo_id", url: "logo_url" }
         },
         category: category,
-        stock: Math.floor(Math.random() * 100) + 1,
-        ratings: (Math.random() * 2 + 3).toFixed(1), // 3.0 to 5.0
-        numOfReviews: Math.floor(Math.random() * 500),
+        stock: Math.floor(Math.random() * 100) + 10,
+        ratings: (Math.random() * 1.5 + 3.5).toFixed(1), // 3.5 to 5.0
+        numOfReviews: Math.floor(Math.random() * 500) + 10,
         user: "64af6b3c10b7b2046d3e3240", // Mock ID
         specifications: [
-            { title: "Quality", description: "Premium" },
-            { title: "Warranty", description: "1 Year" }
+            { title: "Material", description: "Premium Quality" },
+            { title: "Warranty", description: "1 Year Manufacturer Warranty" },
+            { title: "Origin", description: "Imported" }
         ],
         createdAt: Date.now()
     };
@@ -73,17 +78,19 @@ const seedProducts = async () => {
         console.log('Old Products deleted');
 
         let allProducts = [];
+        let globalIndex = 1;
 
         // Generate 20 products per category -> 200 total
         CATEGORIES.forEach(cat => {
             for (let i = 1; i <= 20; i++) {
-                allProducts.push(generateProduct(i, cat));
+                allProducts.push(generateProduct(i, cat, globalIndex));
+                globalIndex++;
             }
         });
 
         await Product.insertMany(allProducts);
         console.log(`Successfully added ${allProducts.length} products across ${CATEGORIES.length} categories.`);
-        console.log("Products seeded");
+        console.log("Products seeded with unique images.");
 
         process.exit();
     } catch (error) {

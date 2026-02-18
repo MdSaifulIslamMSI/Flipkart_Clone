@@ -4,9 +4,9 @@ import * as api from '../../services/api';
 // Async Thunks
 export const fetchProducts = createAsyncThunk(
     'products/fetchAll',
-    async ({ keyword = '', currentPage = 1, price = [0, 200000], category, ratings = 0 }, { rejectWithValue }) => {
+    async ({ keyword = '', currentPage = 1, price = [0, 200000], category, ratings = 0, sort = '' }, { rejectWithValue }) => {
         try {
-            const response = await api.getProducts(keyword, currentPage, price, category, ratings);
+            const response = await api.getProducts(keyword, currentPage, price, category, ratings, sort);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data.message);

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 const SLIDES = [
     {
         id: 1,
-        image: "https://rukminim1.flixcart.com/fk-p-flap/1600/270/image/d9290fb51138d286.png?q=20",
+        image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1600&q=80",
         title: "Big Saving Days",
         subtitle: "Sale is Live!",
         description: "Get up to 80% off on Electronics & Fashion.",
@@ -14,7 +14,7 @@ const SLIDES = [
     },
     {
         id: 2,
-        image: "https://rukminim1.flixcart.com/fk-p-flap/1600/270/image/aa1b2376cd97b6bf.jpg?q=20",
+        image: "https://images.unsplash.com/photo-1598327105666-5b89351aff23?w=1600&q=80",
         title: "Latest Smartphones",
         subtitle: "Just Launched",
         description: "Starting from ₹9,999. Exchange offers available.",
@@ -23,7 +23,7 @@ const SLIDES = [
     },
     {
         id: 3,
-        image: "https://rukminim1.flixcart.com/fk-p-flap/1600/270/image/352e6f0f8034fab5.jpg?q=20",
+        image: "https://images.unsplash.com/photo-1485230946086-1d99d505c599?w=1600&q=80",
         title: "Fashion for All",
         subtitle: "Trending Styles",
         description: "Men, Women & Kids clothing at unbeatable prices.",
@@ -32,7 +32,7 @@ const SLIDES = [
     },
     {
         id: 4,
-        image: "https://rukminim1.flixcart.com/fk-p-flap/1600/270/image/7fd0e4ab26429926.jpg?q=20",
+        image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1600&q=80",
         title: "Home & Furniture",
         subtitle: "Revamp Your Space",
         description: "Premium furniture & decor items for your dream home.",
@@ -41,7 +41,7 @@ const SLIDES = [
     },
     {
         id: 5,
-        image: "https://rukminim1.flixcart.com/fk-p-flap/1600/270/image/61e3d6f1df639c4f.jpg?q=20",
+        image: "https://images.unsplash.com/photo-1593642532744-d377ab507dc8?w=1600&q=80",
         title: "Electronics Sale",
         subtitle: "Best Gadgets",
         description: "Laptops, Headphones, Smartwatches & more.",
@@ -88,7 +88,7 @@ const BannerCarousel = () => {
                                 src={slide.image}
                                 alt={slide.title}
                                 className="w-full h-full object-cover"
-                                onError={(e) => { e.target.src = 'https://via.placeholder.com/1600x300?text=Flipkart+Sale'; }}
+                                onError={(e) => { e.target.src = 'https://via.placeholder.com/1600x300?text=Lumina+Sale'; }}
                             />
 
                             {/* Text Overlay (Gradient) - Optional styling similar to real banners */}
