@@ -1,27 +1,43 @@
-const express = require('express');
-const { registerUser, loginUser, logoutUser, getUserDetails, forgotPassword, resetPassword, updatePassword, updateProfile, getAllUsers, getSingleUser, updateUserRole, deleteUser } = require('../controllers/userController');
-const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
+// User routes — authentication, profile management, and admin user ops.
 
+const express = require("express");
 const router = express.Router();
+const { verifyLogin, restrictToRoles } = require("../middlewares/auth");
 
-router.route('/register').post(registerUser);
-router.route('/login').post(loginUser);
-router.route('/logout').get(logoutUser);
+const {
+    signUpNewUser,
+    authenticateUser,
+    signOutUser,
+    fetchMyProfile,
+    updateMyProfile,
+    changePassword,
+    requestPasswordReset,
+    resetPassword,
+    fetchAllUsers,
+    fetchSingleUser,
+    modifyUserRole,
+    removeUser,
+} = require("../controllers/userController");
 
-router.route('/me').get(isAuthenticatedUser, getUserDetails);
+// Public auth routes
+router.route("/register").post(signUpNewUser);
+router.route("/login").post(authenticateUser);
+router.route("/logout").get(signOutUser);
 
-router.route('/password/forgot').post(forgotPassword);
-router.route('/password/reset/:token').put(resetPassword);
+// Password reset (no auth needed — user is locked out)
+router.route("/password/forgot").post(requestPasswordReset);
+router.route("/password/reset/:token").put(resetPassword);
 
-router.route('/password/update').put(isAuthenticatedUser, updatePassword);
+// Authenticated user routes — must be logged in
+router.route("/me").get(verifyLogin, fetchMyProfile);
+router.route("/me/update").put(verifyLogin, updateMyProfile);
+router.route("/password/update").put(verifyLogin, changePassword);
 
-router.route('/me/update').put(isAuthenticatedUser, updateProfile);
-
-router.route("/admin/users").get(isAuthenticatedUser, authorizeRoles("admin"), getAllUsers);
-
+// Admin-only user management
+router.route("/admin/users").get(verifyLogin, restrictToRoles("admin"), fetchAllUsers);
 router.route("/admin/user/:id")
-    .get(isAuthenticatedUser, authorizeRoles("admin"), getSingleUser)
-    .put(isAuthenticatedUser, authorizeRoles("admin"), updateUserRole)
-    .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteUser);
+    .get(verifyLogin, restrictToRoles("admin"), fetchSingleUser)
+    .put(verifyLogin, restrictToRoles("admin"), modifyUserRole)
+    .delete(verifyLogin, restrictToRoles("admin"), removeUser);
 
 module.exports = router;

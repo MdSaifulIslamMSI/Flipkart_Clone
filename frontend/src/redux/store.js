@@ -1,14 +1,20 @@
-import { configureStore } from '@reduxjs/toolkit';
-import productReducer from './slices/productSlice';
-import userReducer from './slices/userSlice';
-import cartReducer from './slices/cartSlice';
+// Redux store configuration — combines all state slices into
+// a single store that powers the entire application.
 
-const store = configureStore({
+import { configureStore } from '@reduxjs/toolkit';
+import catalogReducer from './slices/productSlice';
+import accountReducer from './slices/userSlice';
+import basketReducer from './slices/cartSlice';
+
+const appStore = configureStore({
     reducer: {
-        products: productReducer,
-        user: userReducer,
-        cart: cartReducer,
+        // Product catalog data (listings, details, loading states)
+        products: catalogReducer,
+        // User authentication and profile
+        user: accountReducer,
+        // Shopping cart items and shipping info
+        cart: basketReducer,
     },
 });
 
-export default store;
+export default appStore;

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../redux/slices/productSlice';
+import { loadProducts } from '../redux/slices/productSlice';
 import ProductCard from '../components/ProductCard';
 import MetaData from '../components/MetaData';
 import Loader from '../components/Loader';
@@ -13,7 +13,7 @@ const Home = () => {
     const { loading, error, products } = useSelector((state) => state.products);
 
     useEffect(() => {
-        dispatch(fetchProducts({}));
+        dispatch(loadProducts({}));
     }, [dispatch]);
 
     // Grouping for new layout

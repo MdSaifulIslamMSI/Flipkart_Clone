@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts } from '../redux/slices/productSlice';
+import { loadProducts } from '../redux/slices/productSlice';
 import ProductCard from '../components/ProductCard';
 import MetaData from '../components/MetaData';
 import Loader from '../components/Loader';
@@ -24,7 +24,7 @@ const ProductListing = () => {
     const { loading, error, products } = useSelector((state) => state.products);
 
     useEffect(() => {
-        dispatch(fetchProducts({ keyword, category, price: priceRange, ratings: selectedRatings, sort: sortBy }));
+        dispatch(loadProducts({ keyword, category, priceRange, ratings: selectedRatings, sort: sortBy }));
     }, [dispatch, keyword, category, priceRange, selectedRatings, sortBy]);
 
     const sortedProducts = products || [];

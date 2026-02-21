@@ -1,17 +1,27 @@
-const express = require('express');
-const { newOrder, getSingleOrderDetails, myOrders, getAllOrders, updateOrder, deleteOrder } = require('../controllers/orderController');
-const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
+// Order routes — placing orders, viewing history, and admin management.
 
+const express = require("express");
 const router = express.Router();
+const { verifyLogin, restrictToRoles } = require("../middlewares/auth");
 
-router.route('/order/new').post(isAuthenticatedUser, newOrder);
-router.route('/order/:id').get(isAuthenticatedUser, getSingleOrderDetails);
-router.route('/orders/me').get(isAuthenticatedUser, myOrders);
+const {
+    placeOrder,
+    fetchOrderDetails,
+    fetchMyOrders,
+    fetchAllOrders,
+    changeOrderStatus,
+    removeOrder,
+} = require("../controllers/orderController");
 
-router.route('/admin/orders').get(isAuthenticatedUser, authorizeRoles("admin"), getAllOrders);
+// Authenticated user routes
+router.route("/order/new").post(verifyLogin, placeOrder);
+router.route("/order/:id").get(verifyLogin, fetchOrderDetails);
+router.route("/orders/me").get(verifyLogin, fetchMyOrders);
 
-router.route('/admin/order/:id')
-    .put(isAuthenticatedUser, authorizeRoles("admin"), updateOrder)
-    .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteOrder);
+// Admin-only routes
+router.route("/admin/orders").get(verifyLogin, restrictToRoles("admin"), fetchAllOrders);
+router.route("/admin/order/:id")
+    .put(verifyLogin, restrictToRoles("admin"), changeOrderStatus)
+    .delete(verifyLogin, restrictToRoles("admin"), removeOrder);
 
 module.exports = router;

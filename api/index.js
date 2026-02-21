@@ -1,43 +1,38 @@
-const connectDatabase = require('../backend/config/database');
+// Vercel serverless entry point — lazily initializes the Express app
+// and database connection for each cold start.
 
-// Cache the database connection
-let dbConnection = null;
+const connectToDatabase = require("../backend/config/database");
+
+let appInstance = null;
+
+const getApp = async () => {
+    if (!appInstance) {
+        // Load env vars
+        require("dotenv").config({ path: "./backend/config/config.env" });
+
+        // Set up Cloudinary
+        const cloudinary = require("cloudinary");
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+        });
+
+        // Connect to MongoDB
+        await connectToDatabase();
+
+        // Load the Express app
+        appInstance = require("../backend/app");
+    }
+    return appInstance;
+};
 
 module.exports = async (req, res) => {
     try {
-        console.log("Function started...");
-
-        // Lazy load app to catch startup errors
-        const app = require('../backend/app');
-        console.log("App loaded successfully.");
-
-        if (!dbConnection) {
-            dbConnection = await connectDatabase();
-            console.log("Database connection attempted.");
-        }
-
-        // Cloudinary config
-        const cloudinary = require('cloudinary');
-        if (process.env.CLOUDINARY_NAME) {
-            cloudinary.config({
-                cloud_name: process.env.CLOUDINARY_NAME,
-                api_key: process.env.CLOUDINARY_API_KEY,
-                api_secret: process.env.CLOUDINARY_API_SECRET,
-            });
-        }
-
+        const app = await getApp();
         return app(req, res);
-    } catch (error) {
-        console.error("Vercel Function Crash:", error);
-        res.status(500).json({
-            success: false,
-            message: "Vercel Function Crashed",
-            error: error.message,
-            stack: error.stack,
-            env_debug: {
-                mongo: !!process.env.MONGO_URI,
-                node: process.version
-            }
-        });
+    } catch (err) {
+        console.error("Serverless function failed:", err);
+        res.status(500).json({ success: false, message: "Server initialization failed" });
     }
 };

@@ -1,97 +1,99 @@
-import React, { useState, useEffect } from 'react';
+// Banner carousel — auto-rotating hero banners on the home page.
+// Supports manual navigation via arrows and dot indicators.
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 
-const SLIDES = [
+// Hero banner slides with promotional content
+const HERO_SLIDES = [
     {
-        id: 1,
+        id: 'sale-live',
         image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1600&q=80",
         title: "Big Saving Days",
         subtitle: "Sale is Live!",
         description: "Get up to 80% off on Electronics & Fashion.",
-        cta: "Shop Now",
-        link: "/products"
+        buttonText: "Shop Now",
+        link: "/products",
     },
     {
-        id: 2,
+        id: 'smartphones',
         image: "https://images.unsplash.com/photo-1598327105666-5b89351aff23?w=1600&q=80",
         title: "Latest Smartphones",
         subtitle: "Just Launched",
         description: "Starting from ₹9,999. Exchange offers available.",
-        cta: "View Mobiles",
-        link: "/products?category=Mobiles"
+        buttonText: "View Mobiles",
+        link: "/products?category=Mobiles",
     },
     {
-        id: 3,
+        id: 'fashion',
         image: "https://images.unsplash.com/photo-1485230946086-1d99d505c599?w=1600&q=80",
         title: "Fashion for All",
         subtitle: "Trending Styles",
         description: "Men, Women & Kids clothing at unbeatable prices.",
-        cta: "Explore Fashion",
-        link: "/products?category=Fashion"
+        buttonText: "Explore Fashion",
+        link: "/products?category=Fashion",
     },
     {
-        id: 4,
+        id: 'home-furniture',
         image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1600&q=80",
         title: "Home & Furniture",
         subtitle: "Revamp Your Space",
         description: "Premium furniture & decor items for your dream home.",
-        cta: "Shop Home",
-        link: "/products?category=Home"
+        buttonText: "Shop Home",
+        link: "/products?category=Home",
     },
     {
-        id: 5,
+        id: 'electronics',
         image: "https://images.unsplash.com/photo-1593642532744-d377ab507dc8?w=1600&q=80",
         title: "Electronics Sale",
         subtitle: "Best Gadgets",
         description: "Laptops, Headphones, Smartwatches & more.",
-        cta: "Grab Deals",
-        link: "/products?category=Electronics"
-    }
+        buttonText: "Grab Deals",
+        link: "/products?category=Electronics",
+    },
 ];
 
+const AUTOPLAY_INTERVAL = 4000; // 4 seconds between slides
+const FALLBACK_BANNER = 'https://placehold.co/1600x300?text=Lumina+Sale';
+
 const BannerCarousel = () => {
-    const [current, setCurrent] = useState(0);
-    const length = SLIDES.length;
+    const [activeIndex, setActiveIndex] = useState(0);
+    const totalSlides = HERO_SLIDES.length;
 
-    const nextSlide = () => {
-        setCurrent(current === length - 1 ? 0 : current + 1);
-    };
+    // Navigate to adjacent slides
+    const goToNext = useCallback(() => {
+        setActiveIndex((prev) => (prev + 1) % totalSlides);
+    }, [totalSlides]);
 
-    const prevSlide = () => {
-        setCurrent(current === 0 ? length - 1 : current - 1);
-    };
+    const goToPrev = useCallback(() => {
+        setActiveIndex((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
+    }, [totalSlides]);
 
-    // Auto-play
+    // Auto-rotate slides
     useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrent(prev => (prev === length - 1 ? 0 : prev + 1));
-        }, 4000);
-        return () => clearInterval(interval);
-    }, [length]);
-
-    if (!Array.isArray(SLIDES) || SLIDES.length <= 0) {
-        return null;
-    }
+        const timer = setInterval(goToNext, AUTOPLAY_INTERVAL);
+        return () => clearInterval(timer);
+    }, [goToNext]);
 
     return (
         <section className="relative w-full h-[200px] sm:h-[280px] lg:h-[320px] bg-gray-100 overflow-hidden shadow-sm mb-4 group">
-            {SLIDES.map((slide, index) => (
+            {/* Slides */}
+            {HERO_SLIDES.map((slide, idx) => (
                 <div
-                    className={`${index === current ? 'opacity-100' : 'opacity-0'} transition-opacity duration-700 ease-in-out absolute top-0 left-0 w-full h-full`}
                     key={slide.id}
+                    className={`${idx === activeIndex ? 'opacity-100' : 'opacity-0'} transition-opacity duration-700 ease-in-out absolute top-0 left-0 w-full h-full`}
                 >
-                    {index === current && (
+                    {idx === activeIndex && (
                         <div className="relative w-full h-full">
-                            {/* Image */}
                             <img
                                 src={slide.image}
                                 alt={slide.title}
                                 className="w-full h-full object-cover"
-                                onError={(e) => { e.target.src = 'https://placehold.co/1600x300?text=Lumina+Sale'; }}
+                                onError={(e) => { e.target.src = FALLBACK_BANNER; }}
                             />
 
-                            {/* Text Overlay (Gradient) - Optional styling similar to real banners */}
+                            {/* Text overlay with gradient background */}
                             <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent flex flex-col justify-center px-8 md:px-16 text-white text-left">
                                 <span className="text-yellow-400 font-bold uppercase tracking-wider text-xs md:text-sm mb-2 drop-shadow-md animate-fade-in-up">
                                     {slide.subtitle}
@@ -103,7 +105,7 @@ const BannerCarousel = () => {
                                     {slide.description}
                                 </p>
                                 <Link to={slide.link} className="inline-block bg-white text-primary font-bold py-2 px-6 rounded-sm shadow-md hover:bg-gray-100 transition-colors w-fit animate-fade-in-up delay-300">
-                                    {slide.cta}
+                                    {slide.buttonText}
                                 </Link>
                             </div>
                         </div>
@@ -111,22 +113,22 @@ const BannerCarousel = () => {
                 </div>
             ))}
 
-            {/* Controls - Visible on Hover */}
-            <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-10 hidden group-hover:block cursor-pointer bg-white/30 hover:bg-white/50 p-2 rounded-full transition-colors" onClick={prevSlide}>
+            {/* Previous/Next arrows — visible on hover */}
+            <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-10 hidden group-hover:block cursor-pointer bg-white/30 hover:bg-white/50 p-2 rounded-full transition-colors" onClick={goToPrev}>
                 <ArrowBackIos className="text-white text-xl pl-1" />
             </div>
-            <div className="absolute top-1/2 right-4 transform -translate-y-1/2 z-10 hidden group-hover:block cursor-pointer bg-white/30 hover:bg-white/50 p-2 rounded-full transition-colors" onClick={nextSlide}>
+            <div className="absolute top-1/2 right-4 transform -translate-y-1/2 z-10 hidden group-hover:block cursor-pointer bg-white/30 hover:bg-white/50 p-2 rounded-full transition-colors" onClick={goToNext}>
                 <ArrowForwardIos className="text-white text-xl" />
             </div>
 
-            {/* Dots */}
+            {/* Dot indicators */}
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
-                {SLIDES.map((_, index) => (
+                {HERO_SLIDES.map((_, idx) => (
                     <div
-                        key={index}
-                        onClick={() => setCurrent(index)}
-                        className={`w-2 h-2 rounded-full cursor-pointer transition-colors ${index === current ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/80'}`}
-                    ></div>
+                        key={idx}
+                        onClick={() => setActiveIndex(idx)}
+                        className={`w-2 h-2 rounded-full cursor-pointer transition-colors ${idx === activeIndex ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/80'}`}
+                    />
                 ))}
             </div>
         </section>

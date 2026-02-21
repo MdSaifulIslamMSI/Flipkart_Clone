@@ -1,14 +1,22 @@
-const express = require('express');
-const { processPayment, paytmResponse, getPaymentStatus } = require('../controllers/paymentController');
-const { isAuthenticatedUser } = require('../middlewares/auth');
+// Payment routes — Paytm integration for processing transactions.
 
+const express = require("express");
 const router = express.Router();
+const { verifyLogin } = require("../middlewares/auth");
 
-router.route('/payment/process').post(processPayment);
-// router.route('/stripeapikey').get(isAuthenticatedUser, sendStripeApiKey);
+const {
+    initiatePayment,
+    handlePaytmCallback,
+    checkPaymentStatus,
+} = require("../controllers/paymentController");
 
-router.route('/callback').post(paytmResponse);
+// Start a payment (requires auth)
+router.route("/payment/process").post(verifyLogin, initiatePayment);
 
-router.route('/payment/status/:id').get(isAuthenticatedUser, getPaymentStatus);
+// Paytm sends the user back here after payment (no auth — redirect flow)
+router.route("/callback").post(handlePaytmCallback);
+
+// Check payment status
+router.route("/payment/status/:id").get(verifyLogin, checkPaymentStatus);
 
 module.exports = router;

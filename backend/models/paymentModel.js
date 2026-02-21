@@ -1,68 +1,34 @@
-const mongoose = require('mongoose');
+// Payment schema — records transaction details from the Paytm gateway
+// so we have a permanent log of every payment attempt.
+
+const mongoose = require("mongoose");
 
 const paymentSchema = new mongoose.Schema({
-    resultInfo: {
-        resultStatus: {
-            type: String,
-            required: true
-        },
-        resultCode: {
-            type: String,
-            required: true
-        },
-        resultMsg: {
-            type: String,
-            required: true
-        },
-    },
-    txnId: {
-        type: String,
-        required: true
-    },
-    bankTxnId: {
-        type: String,
-        required: true
-    },
-    orderId: {
-        type: String,
-        required: true
-    },
-    txnAmount: {
-        type: String,
-        required: true
-    },
-    txnType: {
-        type: String,
-        required: true
-    },
-    gatewayName: {
-        type: String,
-        required: true
-    },
-    bankName: {
-        type: String,
-        required: true
-    },
-    mid: {
-        type: String,
-        required: true
-    },
-    paymentMode: {
-        type: String,
-        required: true
-    },
-    refundAmt: {
-        type: String,
-        required: true
-    },
-    txnDate: {
-        type: String,
-        required: true
-    },
+    // Links this payment to the order and buyer
+    orderId: { type: String, required: true },
+    txnId: { type: String, required: true },
+    bankTxnId: String,
+
+    // Payment outcome
+    resultCode: String,
+    resultMessage: String,
+    txnStatus: { type: String, required: true },
+
+    // Amount and method
+    txnAmount: { type: String, required: true },
+    currency: { type: String, default: "INR" },
+    paymentMode: String,
+    gatewayName: String,
+    bankName: String,
+
+    // Timestamps from the gateway
+    txnDate: String,
+    checksumHash: String,
+
     createdAt: {
         type: Date,
-        default: Date.now
-    }
+        default: Date.now,
+    },
 });
 
 module.exports = mongoose.model("Payment", paymentSchema);

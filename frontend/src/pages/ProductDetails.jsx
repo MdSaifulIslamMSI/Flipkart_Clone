@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProductDetails } from '../redux/slices/productSlice';
+import { loadSingleProduct } from '../redux/slices/productSlice';
 import { addToCart } from '../redux/slices/cartSlice';
 import Loader from '../components/Loader';
 import MetaData from '../components/MetaData';
@@ -12,12 +12,12 @@ import AIChatSupport from '../components/AIChatSupport';
 const ProductDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
-    const { productDetails: product, loading, error } = useSelector((state) => state.products);
+    const { product, loading, error } = useSelector((state) => state.products);
     const [showPayment, setShowPayment] = useState(false);
     const [selectedImage, setSelectedImage] = useState(0);
 
     useEffect(() => {
-        dispatch(fetchProductDetails(id));
+        dispatch(loadSingleProduct(id));
     }, [dispatch, id]);
 
     const addToCartHandler = () => {

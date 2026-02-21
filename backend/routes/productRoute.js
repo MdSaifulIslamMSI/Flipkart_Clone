@@ -1,25 +1,34 @@
-const express = require('express');
-const { getAllProducts, getProductDetails, updateProduct, deleteProduct, getProductReviews, deleteReview, createProductReview, createProduct, getAdminProducts, getProducts } = require('../controllers/productController');
-const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
+// Product routes — maps HTTP endpoints to product controller functions.
 
+const express = require("express");
 const router = express.Router();
+const { verifyLogin, restrictToRoles } = require("../middlewares/auth");
 
-router.route('/products').get(getAllProducts);
-router.route('/products/all').get(getProducts);
+const {
+    fetchAllItems,
+    fetchItemDetails,
+    fetchAdminItems,
+    addNewProduct,
+    modifyProduct,
+    removeProduct,
+    submitReview,
+    fetchReviews,
+    removeReview,
+} = require("../controllers/productController");
 
-router.route('/admin/products').get(isAuthenticatedUser, authorizeRoles("admin"), getAdminProducts);
-router.route('/admin/product/new').post(isAuthenticatedUser, authorizeRoles("admin"), createProduct);
+// Public routes — anyone can browse products
+router.route("/products").get(fetchAllItems);
+router.route("/product/:id").get(fetchItemDetails);
 
-router.route('/admin/product/:id')
-    .put(isAuthenticatedUser, authorizeRoles("admin"), updateProduct)
-    .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteProduct);
+// Authenticated user routes — must be logged in to leave reviews
+router.route("/review").put(verifyLogin, submitReview);
+router.route("/reviews").get(fetchReviews).delete(verifyLogin, removeReview);
 
-router.route('/product/:id').get(getProductDetails);
-
-router.route('/review').put(isAuthenticatedUser, createProductReview);
-
-router.route('/admin/reviews')
-    .get(getProductReviews)
-    .delete(isAuthenticatedUser, deleteReview);
+// Admin-only routes — full CRUD access
+router.route("/admin/products").get(verifyLogin, restrictToRoles("admin"), fetchAdminItems);
+router.route("/admin/product/new").post(verifyLogin, restrictToRoles("admin"), addNewProduct);
+router.route("/admin/product/:id")
+    .put(verifyLogin, restrictToRoles("admin"), modifyProduct)
+    .delete(verifyLogin, restrictToRoles("admin"), removeProduct);
 
 module.exports = router;

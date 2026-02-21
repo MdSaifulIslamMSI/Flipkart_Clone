@@ -1,84 +1,74 @@
-import React, { useEffect, Suspense, lazy } from 'react';
+// Application root — sets up routing, lazy-loaded pages,
+// and session restoration on first mount.
+
+import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loadUser } from './redux/slices/userSlice';
-import Layout from './layout/Layout';
-// import Loader from './components/Loader'; // Ensure Loader exists if you want to use it
+
+// Layout wrapper provides the Header + Footer shell
+import SiteLayout from './layout/Layout';
+import Loader from './components/Loader';
 import ProtectedRoute from './Routes/ProtectedRoute';
-import './index.css';
 
-// Lazy Load Pages for Performance
-const Home = lazy(() => import('./pages/Home'));
-const ProductDetails = lazy(() => import('./pages/ProductDetails'));
-const ProductListing = lazy(() => import('./pages/ProductListing'));
-const Cart = lazy(() => import('./pages/Cart'));
-const Login = lazy(() => import('./pages/Login'));
-const Register = lazy(() => import('./pages/Register'));
-const Shipping = lazy(() => import('./pages/Shipping'));
-const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
-const MyOrders = lazy(() => import('./pages/MyOrders'));
+// ── Lazy-loaded pages (code-split for performance) ─────
+const HomePage = lazy(() => import('./pages/Home'));
+const ProductListingPage = lazy(() => import('./pages/ProductListing'));
+const ProductDetailsPage = lazy(() => import('./pages/ProductDetails'));
+const CartPage = lazy(() => import('./pages/Cart'));
+const LoginPage = lazy(() => import('./pages/Login'));
+const RegisterPage = lazy(() => import('./pages/Register'));
+const ShippingPage = lazy(() => import('./pages/Shipping'));
+const MyOrdersPage = lazy(() => import('./pages/MyOrders'));
+const OrderSuccessPage = lazy(() => import('./pages/OrderSuccess'));
 const InfoPage = lazy(() => import('./pages/InfoPage'));
-const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
-const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
-const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
 
-// Simple Loader for Suspense fallback
-const LoadingFallback = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
-);
+// Admin pages
+const AdminLoginPage = lazy(() => import('./pages/admin/AdminLogin'));
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminProductsPage = lazy(() => import('./pages/admin/AdminProducts'));
 
 function App() {
   const dispatch = useDispatch();
 
+  // Try to restore user session from the auth cookie on mount
   useEffect(() => {
     dispatch(loadUser());
   }, [dispatch]);
 
   return (
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <Suspense fallback={<LoadingFallback />}>
+    <Router>
+      <Suspense fallback={<Loader />}>
         <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/product/:id" element={<ProductDetails />} />
-            <Route path="/products" element={<ProductListing />} />
-            <Route path="/products/:keyword" element={<ProductListing />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/shipping" element={<Shipping />} />
-            <Route path="/order/success" element={<OrderSuccess />} />
-            <Route path="/orders" element={<MyOrders />} />
-            {/* Footer Static Pages */}
-            <Route path="/contact" element={<InfoPage title="Contact Us" />} />
+          {/* ── Public Routes (with Header/Footer) ───── */}
+          <Route element={<SiteLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/products" element={<ProductListingPage />} />
+            <Route path="/products/:keyword" element={<ProductListingPage />} />
+            <Route path="/product/:id" element={<ProductDetailsPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/order/success" element={<OrderSuccessPage />} />
+
+            {/* Info pages (about, contact, policies) */}
             <Route path="/about" element={<InfoPage title="About Us" />} />
-            <Route path="/careers" element={<InfoPage title="Careers" />} />
-            <Route path="/stories" element={<InfoPage title="Lumina Stories" />} />
-            <Route path="/payments" element={<InfoPage title="Payments" />} />
-            <Route path="/shipping-info" element={<InfoPage title="Shipping" />} />
-            <Route path="/cancellation-returns" element={<InfoPage title="Cancellation & Returns" />} />
+            <Route path="/contact" element={<InfoPage title="Contact Us" />} />
             <Route path="/faq" element={<InfoPage title="FAQ" />} />
-            <Route path="/return-policy" element={<InfoPage title="Return Policy" />} />
-            <Route path="/terms" element={<InfoPage title="Terms Of Use" />} />
-            <Route path="/security" element={<InfoPage title="Security" />} />
-            <Route path="/privacy" element={<InfoPage title="Privacy" />} />
-            <Route path="*" element={<Home />} />
+
+            {/* ── Protected Routes (logged-in users only) ── */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/shipping" element={<ShippingPage />} />
+              <Route path="/orders" element={<MyOrdersPage />} />
+            </Route>
           </Route>
 
-          {/* Admin Routes (Separate Layout) */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={
-            <ProtectedRoute isAdmin={true}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/admin/products" element={
-            <ProtectedRoute isAdmin={true}>
-              <AdminProducts />
-            </ProtectedRoute>
-          } />
+          {/* ── Admin Routes (no Header/Footer) ──────── */}
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route element={<ProtectedRoute adminOnly={true} />}>
+            <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+            <Route path="/admin/products" element={<AdminProductsPage />} />
+          </Route>
         </Routes>
       </Suspense>
     </Router>

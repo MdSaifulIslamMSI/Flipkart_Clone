@@ -1,38 +1,59 @@
+// Cart slice — manages shopping basket items and shipping details.
+// Cart data is persisted in localStorage so it survives page refreshes.
+
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-    cartItems: localStorage.getItem('cartItems')
-        ? JSON.parse(localStorage.getItem('cartItems'))
-        : [],
-};
+// Read initial cart state from localStorage (if available)
+const savedCartItems = JSON.parse(localStorage.getItem('basketItems')) || [];
+const savedShippingInfo = JSON.parse(localStorage.getItem('deliveryInfo')) || {};
 
-const cartSlice = createSlice({
-    name: 'cart',
-    initialState,
+const basketSlice = createSlice({
+    name: 'basket',
+    initialState: {
+        cartItems: savedCartItems,
+        shippingInfo: savedShippingInfo,
+    },
     reducers: {
+        // Add a new item or update quantity if it's already in the cart
         addToCart: (state, action) => {
-            const item = action.payload;
-            const isItemExist = state.cartItems.find((i) => i.product === item.product);
+            const incomingItem = action.payload;
+            const existingIndex = state.cartItems.findIndex(
+                (item) => item.product === incomingItem.product
+            );
 
-            if (isItemExist) {
-                state.cartItems = state.cartItems.map((i) =>
-                    i.product === isItemExist.product ? item : i
-                );
+            if (existingIndex >= 0) {
+                // Update existing item's quantity
+                state.cartItems[existingIndex] = incomingItem;
             } else {
-                state.cartItems.push(item);
+                // Add new item to cart
+                state.cartItems.push(incomingItem);
             }
-            localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
+
+            // Sync to localStorage
+            localStorage.setItem('basketItems', JSON.stringify(state.cartItems));
         },
+
+        // Remove an item from the cart by its product ID
         removeFromCart: (state, action) => {
-            state.cartItems = state.cartItems.filter((i) => i.product !== action.payload);
-            localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
+            state.cartItems = state.cartItems.filter(
+                (item) => item.product !== action.payload
+            );
+            localStorage.setItem('basketItems', JSON.stringify(state.cartItems));
         },
+
+        // Save/update the shipping address
         saveShippingInfo: (state, action) => {
             state.shippingInfo = action.payload;
-            localStorage.setItem('shippingInfo', JSON.stringify(state.shippingInfo));
-        }
+            localStorage.setItem('deliveryInfo', JSON.stringify(action.payload));
+        },
+
+        // Empty the cart (used after successful order placement)
+        clearCart: (state) => {
+            state.cartItems = [];
+            localStorage.removeItem('basketItems');
+        },
     },
 });
 
-export const { addToCart, removeFromCart, saveShippingInfo } = cartSlice.actions;
-export default cartSlice.reducer;
+export const { addToCart, removeFromCart, saveShippingInfo, clearCart } = basketSlice.actions;
+export default basketSlice.reducer;

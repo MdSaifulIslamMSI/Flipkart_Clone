@@ -1,78 +1,82 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
+// User schema — defines the shape of user documents in MongoDB,
+// including password hashing, JWT generation, and reset token logic.
+
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, "Please Enter Your Name"],
+        required: [true, "Name is required"],
+        maxLength: [30, "Name cannot exceed 30 characters"],
+        minLength: [2, "Name must be at least 2 characters"],
     },
     email: {
         type: String,
-        required: [true, "Please Enter Your Email"],
+        required: [true, "Email is required"],
         unique: true,
+        match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address"],
     },
     gender: {
         type: String,
-        required: [true, "Please Enter Gender"]
+        enum: ["male", "female", "other"],
     },
     password: {
         type: String,
-        required: [true, "Please Enter Your Password"],
-        minLength: [8, "Password should have atleast 8 chars"],
-        select: false,
+        required: [true, "Password is required"],
+        minLength: [8, "Password must be at least 8 characters"],
+        select: false, // Never return password in queries by default
     },
     avatar: {
-        public_id: {
-            type: String,
-        },
-        url: {
-            type: String,
-        }
+        public_id: String,
+        url: String,
     },
     role: {
         type: String,
         default: "user",
     },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
     createdAt: {
         type: Date,
         default: Date.now,
     },
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
 });
 
+// Hash the password before saving, but only if it was modified
 userSchema.pre("save", async function (next) {
-
-    if (!this.isModified("password")) {
-        next();
-    }
-
+    if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password, 10);
 });
 
-userSchema.methods.getJWTToken = function () {
+// Create a signed JWT containing the user's ID
+userSchema.methods.generateAuthToken = function () {
     return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE
+        expiresIn: process.env.JWT_EXPIRE,
     });
-}
+};
 
-userSchema.methods.comparePassword = async function (enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
-}
+// Compare a plain-text password with the hashed one in the database
+userSchema.methods.verifyPassword = async function (candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
+};
 
-userSchema.methods.getResetPasswordToken = async function () {
+// Generate a random token for password reset and store its hash
+userSchema.methods.createResetToken = function () {
+    const rawToken = crypto.randomBytes(20).toString("hex");
 
-    // generate token
-    const resetToken = crypto.randomBytes(20).toString("hex");
+    // Store a hashed version so the raw token isn't saved in the DB
+    this.resetPasswordToken = crypto
+        .createHash("sha256")
+        .update(rawToken)
+        .digest("hex");
 
-    // generate hash token and add to db
-    this.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+    // Token expires in 15 minutes
     this.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
 
-    return resetToken;
-}
+    return rawToken;
+};
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);

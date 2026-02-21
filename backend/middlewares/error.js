@@ -1,35 +1,36 @@
-const ErrorHandler = require("../utils/errorHandler");
+// Central error-handling middleware — transforms raw errors
+// into clean JSON responses with the right HTTP status code.
 
-module.exports = (err, req, res, next) => {
-    err.statusCode = err.statusCode || 500;
-    err.message = err.message || "Internal Server Error";
+const handleErrors = (err, _req, res, _next) => {
+    // Default to 500 Internal Server Error if nothing else applies
+    const statusCode = err.statusCode || 500;
+    let message = err.message || "Something went wrong on our end";
 
-    // mongodb id error
+    // MongoDB: invalid ObjectId format (e.g. wrong product ID in URL)
     if (err.name === "CastError") {
-        const message = `Resource Not Found. Invalid: ${err.path}`;
-        err = new ErrorHandler(message, 400)
+        message = `Invalid value for ${err.path}: ${err.value}`;
     }
 
-    // mongoose duplicate key error
+    // MongoDB: duplicate key (e.g. email already registered)
     if (err.code === 11000) {
-        const message = `Duplicate ${Object.keys(err.keyValue)} entered`;
-        err = new ErrorHandler(message, 400);
+        const field = Object.keys(err.keyValue).join(", ");
+        message = `A record with that ${field} already exists`;
     }
 
-    // wrong jwt error
-    if (err.code === "JsonWebTokenError") {
-        const message = 'JWT Error';
-        err = new ErrorHandler(message, 400);
+    // JWT: token has been tampered with
+    if (err.name === "JsonWebTokenError") {
+        message = "Your authentication token is invalid. Please log in again.";
     }
 
-    // jwt expire error
-    if (err.code === "JsonWebTokenError") {
-        const message = 'JWT is Expired';
-        err = new ErrorHandler(message, 400);
+    // JWT: token has expired
+    if (err.name === "TokenExpiredError") {
+        message = "Your session has expired. Please log in again.";
     }
 
-    res.status(err.statusCode).json({
+    res.status(statusCode).json({
         success: false,
-        message: err.message,
+        message,
     });
-}
+};
+
+module.exports = handleErrors;

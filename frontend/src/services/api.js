@@ -1,54 +1,76 @@
+// API service layer — centralizes all HTTP requests to the backend.
+// Uses Axios with a base URL configured for the environment.
+
 import axios from 'axios';
 
-// Toggle this to switch between mock and real data
-// Ideally, this should come from process.env.REACT_APP_USE_MOCK
-// Toggle this to switch between mock and real data
-// Ideally, this should come from process.env.REACT_APP_USE_MOCK
-// const USE_MOCK_DATA = false;
-
-// Use relative path in production (Vercel), localhost in dev
-const BASE_URL = process.env.NODE_ENV === 'production'
-    ? '/api/v1'
-    : 'http://localhost:4000/api/v1';
+// Base URL switches between local dev and production
+const BASE_URL = process.env.REACT_APP_API_URL || '';
 
 const api = axios.create({
     baseURL: BASE_URL,
     withCredentials: true,
-    headers: {
-        'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
 });
 
+// ── Product APIs ───────────────────────────────────────
 
+export const fetchProductsAPI = (params = {}) => {
+    const { keyword = '', page = 1, category, priceRange, ratings, sort } = params;
 
-export const getProducts = async (keyword = '', currentPage = 1, price = [0, 500000], category, ratings = 0, sort = '') => {
-    // Real API Call
-    let link = `/products?keyword=${keyword}&page=${currentPage}&price[gte]=${price[0]}&price[lte]=${price[1]}&ratings[gte]=${ratings}`;
-    if (category) {
-        link = `/products?page=${currentPage}&price[gte]=${price[0]}&price[lte]=${price[1]}&category=${category}&ratings[gte]=${ratings}`;
-    }
-    if (sort) {
-        link += `&sort=${sort}`;
-    }
-    return api.get(link);
+    let queryString = `/api/v1/products?keyword=${keyword}&page=${page}`;
+    if (category) queryString += `&category=${category}`;
+    if (priceRange) queryString += `&price[gte]=${priceRange[0]}&price[lte]=${priceRange[1]}`;
+    if (ratings) queryString += `&ratings[gte]=${ratings}`;
+    if (sort) queryString += `&sort=${sort}`;
+
+    return api.get(queryString);
 };
 
-export const getProductDetails = async (id) => {
-    return api.get(`/product/${id}`);
-};
+export const fetchProductDetailsAPI = (productId) =>
+    api.get(`/api/v1/product/${productId}`);
 
-export const loginUser = async (email, password) => {
-    return api.post(`/login`, { email, password });
-};
+// ── Auth APIs ──────────────────────────────────────────
 
-// Register
-export const registerUser = async (userData) => {
-    const config = { headers: { "Content-Type": "multipart/form-data" } };
-    return api.post(`/register`, userData, config);
-};
+export const loginAPI = (credentials) =>
+    api.post('/api/v1/login', credentials);
 
-export const loadUser = async () => {
-    return api.get(`/me`);
-};
+export const registerAPI = (formData) =>
+    api.post('/api/v1/register', formData);
+
+export const fetchProfileAPI = () =>
+    api.get('/api/v1/me');
+
+export const logoutAPI = () =>
+    api.get('/api/v1/logout');
+
+// ── Order APIs ─────────────────────────────────────────
+
+export const placeOrderAPI = (orderData) =>
+    api.post('/api/v1/order/new', orderData);
+
+export const fetchMyOrdersAPI = () =>
+    api.get('/api/v1/orders/me');
+
+export const fetchOrderDetailsAPI = (orderId) =>
+    api.get(`/api/v1/order/${orderId}`);
+
+// ── Payment APIs ───────────────────────────────────────
+
+export const initiatePaymentAPI = (paymentData) =>
+    api.post('/api/v1/payment/process', paymentData);
+
+export const checkPaymentStatusAPI = (paymentId) =>
+    api.get(`/api/v1/payment/status/${paymentId}`);
+
+// ── Admin APIs ─────────────────────────────────────────
+
+export const fetchAdminProductsAPI = () =>
+    api.get('/api/v1/admin/products');
+
+export const fetchAdminOrdersAPI = () =>
+    api.get('/api/v1/admin/orders');
+
+export const fetchAdminUsersAPI = () =>
+    api.get('/api/v1/admin/users');
 
 export default api;

@@ -1,10 +1,11 @@
-class ErrorHandler extends Error {
+// Custom error class — attaches an HTTP status code to each error
+// so the central error handler knows what to respond with.
+
+class AppError extends Error {
     constructor(message, statusCode) {
         super(message);
-        this.statusCode = statusCode
-
-        Error.captureStackTrace(this, this.constructor);
+        this.statusCode = statusCode;
     }
 }
 
-module.exports = ErrorHandler;
+module.exports = AppError;

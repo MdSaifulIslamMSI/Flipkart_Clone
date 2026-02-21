@@ -1,155 +1,129 @@
-const asyncErrorHandler = require('../middlewares/asyncErrorHandler');
-const Order = require('../models/orderModel');
-const Product = require('../models/productModel');
-const ErrorHandler = require('../utils/errorHandler');
-const sendEmail = require('../utils/sendEmail');
+// Order controller — handles creating, viewing, updating, and
+// deleting orders; also updates product stock on delivery.
 
-// Create New Order
-exports.newOrder = asyncErrorHandler(async (req, res, next) => {
+const Order = require("../models/orderModel");
+const Product = require("../models/productModel");
+const catchAsync = require("../middlewares/asyncErrorHandler");
+const AppError = require("../utils/errorHandler");
+const sendEmail = require("../utils/sendEmail");
 
+// Helper: decrements stock for each item in a delivered order
+const decrementStock = async (productId, soldQuantity) => {
+    const product = await Product.findById(productId);
+    if (product) {
+        product.stock = Math.max(0, product.stock - soldQuantity);
+        await product.save({ validateBeforeSave: false });
+    }
+};
+
+// POST /order/new — place a new order
+exports.placeOrder = catchAsync(async (req, res) => {
     const {
         shippingInfo,
         orderItems,
         paymentInfo,
+        itemsPrice,
+        taxPrice,
+        shippingPrice,
         totalPrice,
     } = req.body;
 
-    const orderExist = await Order.findOne({ paymentInfo });
-
-    if (orderExist) {
-        return next(new ErrorHandler("Order Already Placed", 400));
+    // Check if this transaction was already used for another order
+    const existingOrder = await Order.findOne({ "paymentInfo.id": paymentInfo.id });
+    if (existingOrder) {
+        return res.status(200).json({ success: true, order: existingOrder });
     }
 
-    const order = await Order.create({
+    const newOrder = await Order.create({
         shippingInfo,
         orderItems,
         paymentInfo,
+        itemsPrice,
+        taxPrice,
+        shippingPrice,
         totalPrice,
         paidAt: Date.now(),
         user: req.user._id,
     });
 
-    await sendEmail({
-        email: req.user.email,
-        templateId: process.env.SENDGRID_ORDER_TEMPLATEID,
-        data: {
-            name: req.user.name,
-            shippingInfo,
-            orderItems,
-            totalPrice,
-            oid: order._id,
-        }
-    });
+    // Send order confirmation email
+    try {
+        await sendEmail({
+            email: req.user.email,
+            templateId: process.env.SENDGRID_ORDER_TEMPLATEID,
+            data: {
+                username: req.user.name,
+                shippingInfo,
+                orderItems,
+                totalPrice,
+                orderId: newOrder._id,
+            },
+        });
+    } catch (_emailErr) {
+        // Don't fail the order if the email doesn't send
+        console.error("Order confirmation email failed to send");
+    }
 
-    res.status(201).json({
-        success: true,
-        order,
-    });
+    res.status(201).json({ success: true, order: newOrder });
 });
 
-// Get Single Order Details
-exports.getSingleOrderDetails = asyncErrorHandler(async (req, res, next) => {
-
+// GET /order/:id — view a specific order's details
+exports.fetchOrderDetails = catchAsync(async (req, res, next) => {
     const order = await Order.findById(req.params.id).populate("user", "name email");
 
     if (!order) {
-        return next(new ErrorHandler("Order Not Found", 404));
+        return next(new AppError("Order not found", 404));
     }
 
-    res.status(200).json({
-        success: true,
-        order,
-    });
+    res.status(200).json({ success: true, order });
 });
 
-
-// Get Logged In User Orders
-exports.myOrders = asyncErrorHandler(async (req, res, next) => {
-
+// GET /orders/me — list all orders for the logged-in user
+exports.fetchMyOrders = catchAsync(async (req, res) => {
     const orders = await Order.find({ user: req.user._id });
-
-    if (!orders) {
-        return next(new ErrorHandler("Order Not Found", 404));
-    }
-
-    res.status(200).json({
-        success: true,
-        orders,
-    });
+    res.status(200).json({ success: true, orders });
 });
 
+// ── Admin Routes ───────────────────────────────────────
 
-// Get All Orders ---ADMIN
-exports.getAllOrders = asyncErrorHandler(async (req, res, next) => {
-
+// GET /admin/orders — list every order in the system
+exports.fetchAllOrders = catchAsync(async (_req, res) => {
     const orders = await Order.find();
 
-    if (!orders) {
-        return next(new ErrorHandler("Order Not Found", 404));
-    }
+    // Calculate total revenue across all orders
+    const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
 
-    let totalAmount = 0;
-    orders.forEach((order) => {
-        totalAmount += order.totalPrice;
-    });
-
-    res.status(200).json({
-        success: true,
-        orders,
-        totalAmount,
-    });
+    res.status(200).json({ success: true, totalAmount: totalRevenue, orders });
 });
 
-// Update Order Status ---ADMIN
-exports.updateOrder = asyncErrorHandler(async (req, res, next) => {
-
+// PUT /admin/order/:id — update order status (e.g. Processing → Shipped → Delivered)
+exports.changeOrderStatus = catchAsync(async (req, res, next) => {
     const order = await Order.findById(req.params.id);
-
-    if (!order) {
-        return next(new ErrorHandler("Order Not Found", 404));
-    }
+    if (!order) return next(new AppError("Order not found", 404));
 
     if (order.orderStatus === "Delivered") {
-        return next(new ErrorHandler("Already Delivered", 400));
+        return next(new AppError("This order has already been delivered", 400));
     }
 
-    if (req.body.status === "Shipped") {
-        order.shippedAt = Date.now();
-        order.orderItems.forEach(async (i) => {
-            await updateStock(i.product, i.quantity)
-        });
-    }
-
-    order.orderStatus = req.body.status;
+    // When marking as delivered, reduce stock for each product
     if (req.body.status === "Delivered") {
+        for (const item of order.orderItems) {
+            await decrementStock(item.product, item.quantity);
+        }
         order.deliveredAt = Date.now();
     }
 
+    order.orderStatus = req.body.status;
     await order.save({ validateBeforeSave: false });
 
-    res.status(200).json({
-        success: true
-    });
+    res.status(200).json({ success: true });
 });
 
-async function updateStock(id, quantity) {
-    const product = await Product.findById(id);
-    product.stock -= quantity;
-    await product.save({ validateBeforeSave: false });
-}
-
-// Delete Order ---ADMIN
-exports.deleteOrder = asyncErrorHandler(async (req, res, next) => {
-
+// DELETE /admin/order/:id — remove an order
+exports.removeOrder = catchAsync(async (req, res, next) => {
     const order = await Order.findById(req.params.id);
-
-    if (!order) {
-        return next(new ErrorHandler("Order Not Found", 404));
-    }
+    if (!order) return next(new AppError("Order not found", 404));
 
     await order.remove();
-
-    res.status(200).json({
-        success: true,
-    });
+    res.status(200).json({ success: true });
 });

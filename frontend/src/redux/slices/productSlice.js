@@ -1,79 +1,89 @@
+// Product slice — manages the product catalog state including
+// product listings, individual item details, and loading/error states.
+
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import * as api from '../../services/api';
+import { fetchProductsAPI, fetchProductDetailsAPI } from '../../services/api';
 
-// Async Thunks
-export const fetchProducts = createAsyncThunk(
-    'products/fetchAll',
-    async ({ keyword = '', currentPage = 1, price = [0, 200000], category, ratings = 0, sort = '' }, { rejectWithValue }) => {
+// ── Async Actions ──────────────────────────────────────
+
+// Load the product listing (with optional search/filter/sort params)
+export const loadProducts = createAsyncThunk(
+    'catalog/loadAll',
+    async (queryParams = {}, { rejectWithValue }) => {
         try {
-            const response = await api.getProducts(keyword, currentPage, price, category, ratings, sort);
+            const response = await fetchProductsAPI(queryParams);
             return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response.data.message);
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Failed to load products');
         }
     }
 );
 
-export const fetchProductDetails = createAsyncThunk(
-    'products/fetchDetails',
-    async (id, { rejectWithValue }) => {
+// Load details for a single product by its ID
+export const loadSingleProduct = createAsyncThunk(
+    'catalog/loadOne',
+    async (productId, { rejectWithValue }) => {
         try {
-            const response = await api.getProductDetails(id);
+            const response = await fetchProductDetailsAPI(productId);
             return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || 'Error fetching details');
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || 'Failed to load product details');
         }
     }
 );
 
-const productSlice = createSlice({
-    name: 'products',
+// ── Slice Definition ───────────────────────────────────
+
+const catalogSlice = createSlice({
+    name: 'catalog',
     initialState: {
         products: [],
-        productDetails: {},
+        product: null,
         productsCount: 0,
-        resultPerPage: 0,
-        filteredProductsCount: 0,
+        filteredCount: 0,
+        resultPerPage: 8,
         loading: false,
         error: null,
     },
     reducers: {
-        clearErrors: (state) => {
+        dismissError: (state) => {
             state.error = null;
         },
     },
     extraReducers: (builder) => {
         builder
-            // Fetch All Products
-            .addCase(fetchProducts.pending, (state) => {
+            // ── Load All Products ──────────────────────
+            .addCase(loadProducts.pending, (state) => {
                 state.loading = true;
-                state.products = [];
+                state.error = null;
             })
-            .addCase(fetchProducts.fulfilled, (state, action) => {
+            .addCase(loadProducts.fulfilled, (state, action) => {
                 state.loading = false;
                 state.products = action.payload.products;
                 state.productsCount = action.payload.productsCount;
+                state.filteredCount = action.payload.filteredProductsCount;
                 state.resultPerPage = action.payload.resultPerPage;
-                state.filteredProductsCount = action.payload.filteredProductsCount;
             })
-            .addCase(fetchProducts.rejected, (state, action) => {
+            .addCase(loadProducts.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
-            // Fetch Product Details
-            .addCase(fetchProductDetails.pending, (state) => {
+
+            // ── Load Single Product ────────────────────
+            .addCase(loadSingleProduct.pending, (state) => {
                 state.loading = true;
+                state.error = null;
             })
-            .addCase(fetchProductDetails.fulfilled, (state, action) => {
+            .addCase(loadSingleProduct.fulfilled, (state, action) => {
                 state.loading = false;
-                state.productDetails = action.payload.product;
+                state.product = action.payload.product;
             })
-            .addCase(fetchProductDetails.rejected, (state, action) => {
+            .addCase(loadSingleProduct.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });
     },
 });
 
-export const { clearErrors } = productSlice.actions;
-export default productSlice.reducer;
+export const { dismissError } = catalogSlice.actions;
+export default catalogSlice.reducer;
